@@ -21,3 +21,7 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+cdcreact-1.0.0-SNAPSHOT.jar
+jdk-8u221-windows-x64.exe
+mysql-installer-community-8.0.17.0.msi
+.vscode/tasks.json
