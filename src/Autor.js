@@ -1,20 +1,21 @@
 import React, { Component } from 'react';
 import $ from 'jquery';
 import InputCustomizado from './componentes/InputCustomizado';
+import BotaoSubmitCustomizado from './componentes/BotaoSubmitCustomizado';
 import PubSub from 'pubsub-js';
-import TratadorErros from  './TratadorErros';
+import TratadorErros from './TratadorErros';
 
 class FormularioAutor extends Component {
 
-  constructor() {
-    super();    
-    this.state = {nome:'',email:'',senha:''};
-    this.enviaForm = this.enviaForm.bind(this);
-    this.setNome = this.setNome.bind(this);
-    this.setEmail = this.setEmail.bind(this);
-    this.setSenha = this.setSenha.bind(this);
-  }
-  
+    constructor() {
+        super();
+        this.state = { nome: '', email: '', senha: '' };
+        this.enviaForm = this.enviaForm.bind(this);
+        this.setNome = this.setNome.bind(this);
+        this.setEmail = this.setEmail.bind(this);
+        this.setSenha = this.setSenha.bind(this);
+    }
+
     enviaForm(evento) {
         evento.preventDefault();
         console.log("dados sendo enviados");
@@ -32,8 +33,8 @@ class FormularioAutor extends Component {
             }),
             success: function (novaListagem) {
                 console.log("enviado com sucesso");
-                PubSub.publish('atualiza-lista-autores',novaListagem);
-                this.setState({ nome:'',email:'',senha:'' });
+                PubSub.publish('atualiza-lista-autores', novaListagem);
+                this.setState({ nome: '', email: '', senha: '' });
             }.bind(this),
             error: function (resposta) {
                 console.log(resposta);
@@ -65,10 +66,7 @@ class FormularioAutor extends Component {
                     <InputCustomizado id="nome" type="text" name="nome" value={this.state.nome} onChange={this.setNome} label="Nome" />
                     <InputCustomizado id="email" type="email" name="email" value={this.state.email} onChange={this.setEmail} label="Email" />
                     <InputCustomizado id="senha" type="password" name="senha" value={this.state.senha} onChange={this.setSenha} label="Senha" />
-                    <div className="pure-control-group">
-                        <label></label>
-                        <button type="submit" className="pure-button pure-button-primary">Gravar</button>
-                    </div>
+                    <BotaoSubmitCustomizado />
                 </form>
 
             </div>
@@ -76,7 +74,8 @@ class FormularioAutor extends Component {
     }
 }
 
-class TabelaAutor extends Component {
+
+class TabelaAutores extends Component {
     render() {
         return (
             <div>
@@ -105,36 +104,41 @@ class TabelaAutor extends Component {
     }
 }
 
-
 export default class AutorBox extends Component {
+
     constructor() {
-        super();
-        this.state = { lista: [] };
+      super();    
+      this.state = {lista : []};    
     }
-
-
-    componentDidMount() {
-        $.ajax({
-            url: 'http://localhost:8080/api/autores',
-            //url: "https://cdc-react.herokuapp.com/api/autores",
-            dataType: 'json',
-            success: function (resposta) {
-                this.setState({ lista: resposta });
-            }.bind(this)
-        }
-        );
-
-
-        PubSub.subscribe('atualiza-lista-autores', function (topico, novaLista) {
-            this.setState({ lista: novaLista });
-        }.bind(this));
+  
+    componentDidMount(){  
+      $.ajax({
+          url:"http://localhost:8080/api/autores",
+          dataType: 'json',
+          success:function(resposta){    
+            this.setState({lista:resposta});
+          }.bind(this)
+        } 
+      );          
+  
+      PubSub.subscribe('atualiza-lista-autores',function(topico,novaLista){
+        this.setState({lista:novaLista});
+      }.bind(this));
+    }   
+  
+  
+    render(){
+      return (
+        <div>
+          <div className="header">
+            <h1>Cadastro de autores</h1>
+          </div>
+          <div className="content" id="content">                            
+            <FormularioAutor/>
+            <TabelaAutores lista={this.state.lista}/>        
+          </div>      
+  
+        </div>
+      );
     }
-    render() {
-        return (
-            <div>
-                <FormularioAutor />
-                <TabelaAutor lista={this.state.lista} />
-            </div>
-        );
-    }
-}
+  }
